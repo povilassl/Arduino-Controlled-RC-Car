@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Remote</string>
+    <string name="bluetooth_connect">Connect</string>
+    <string name="bluetooth_disconnect">Disconnect</string>
+</resources>
