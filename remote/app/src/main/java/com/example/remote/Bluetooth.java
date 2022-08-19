@@ -1,6 +1,7 @@
 package com.example.remote;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -9,6 +10,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -21,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -32,6 +35,7 @@ import java.util.logging.ConsoleHandler;
 
 public class Bluetooth extends AppCompatActivity {
 
+    TextView textView;
     ListView listView;
     BluetoothAdapter bluetoothAdapter;
     BluetoothManager bluetoothManager;
@@ -46,7 +50,7 @@ public class Bluetooth extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        //init and assing variable
+        //init and assign variable
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         //set dashboard selected
@@ -74,12 +78,15 @@ public class Bluetooth extends AppCompatActivity {
             }
         });
 
+        //set text view
+        textView = (TextView) findViewById(R.id.connected_device_text);
 
         //getting devices into listview
         listView = findViewById(R.id.devicesListView);
         bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
+        //TODO: alert box for permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             Log.d("TAG", "Missing BLUETOOTH_CONNECT permission");
             return;
@@ -103,6 +110,9 @@ public class Bluetooth extends AppCompatActivity {
                 selectedDeviceIndex = i;
             }
         });
+
+        updateText(false);
+
     }
 
     public void bluetoothConnect(View view) {
@@ -113,17 +123,18 @@ public class Bluetooth extends AppCompatActivity {
         String deviceName = tmpList.get(selectedDeviceIndex).toString();
 
         try {
-            //checking permissions
+            //checking permissions, TODO: alert box for permissions
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("Tag", "permissions not granted");
                 return;
             }
 
             //if socket is already connected, disconnect, do it in 2 steps because otherwise it throws exception
-            if(_socket != null){
+            if (_socket != null) {
                 if (_socket.isConnected()) {
                     Log.d("Tag", "Closing already connected socket...");
                     _socket.close();
+
                 }
             }
 
@@ -139,10 +150,30 @@ public class Bluetooth extends AppCompatActivity {
                 Log.d("Tag", "Successfully connected to device \"" + deviceName + "\"");
             }
 
+            //update view - true because device connected succesfully
+            updateText(true);
+
         } catch (Exception e) {
             Log.d("Tag", "Error connecting to device \"" + deviceName + "\"");
-        }
 
+            //show dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(Bluetooth.this);
+            builder
+                    .setTitle("Connecting to " + device.getName())
+                    .setMessage("Error: couldn't connect to this device")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            //update view - false - device failed to connect
+            updateText(false);
+        }
     }
 
     public void bluetoothDisconnect(View view) {
@@ -164,5 +195,27 @@ public class Bluetooth extends AppCompatActivity {
         } catch (Exception e) {
             Log.d("Tag", "Error disconnecting from device \"" + deviceName + "\"");
         }
+    }
+
+    private void updateText(boolean flag) {
+
+        String text = "Connected: ";
+
+        if (flag) {
+
+            String deviceName = savedList.get(selectedDeviceIndex).toString();
+            deviceName = "my long device name";
+
+            //TODO: check if possible to measure width
+            if(deviceName.length() > 10){
+                deviceName = deviceName.substring(0, 8).concat("...");
+            }
+            text = text.concat(deviceName);
+        } else {
+            text = text.concat("none");
+        }
+
+        textView.setText(text);
+
     }
 }

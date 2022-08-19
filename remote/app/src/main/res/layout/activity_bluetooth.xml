@@ -7,15 +7,23 @@
     tools:context=".Bluetooth">
 
 
+    <TextView
+        android:id="@+id/connected_device_text"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:textSize="25sp" />
+
     <ListView
         android:id="@+id/devicesListView"
         android:layout_width="match_parent"
-        android:layout_height="628dp"
+        android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
+        android:layout_marginTop="60dp"
         android:layout_marginBottom="120dp"
         android:choiceMode="singleChoice"
-        android:listSelector="@drawable/list_selector"
-        />
+        android:listSelector="@drawable/list_selector" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,16 +39,16 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
-            android:text="@string/bluetooth_connect"
-            android:onClick="bluetoothConnect"/>
+            android:onClick="bluetoothConnect"
+            android:text="@string/bluetooth_connect" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:text="@string/bluetooth_disconnect"
-            android:onClick="bluetoothDisconnect"/>
+            android:onClick="bluetoothDisconnect"
+            android:text="@string/bluetooth_disconnect" />
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

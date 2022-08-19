@@ -57,6 +57,8 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
+        //tesing
+
 
         //get socket and set output stream
         try {
