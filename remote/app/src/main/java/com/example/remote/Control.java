@@ -1,9 +1,11 @@
 package com.example.remote;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,8 +71,9 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
 
         } catch (Exception e) {
             //err
-            Log.d("Tag", "Couldnt get socket or output stream");
-//            return;
+            Log.d("Tag", "Couldn't get socket or output stream");
+            showDialogBox(1);
+            return;
         }
 
         Button buttonForward = (Button) findViewById(R.id.button_forward);
@@ -120,8 +123,45 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
             _outStream.writeChar(command);
         }catch (Exception e){
             Log.d("Tag", "Couldn't write to socket");
+            showDialogBox(1);
         }
 
     }
+
+    //show custom dialog box based on choice of error provided
+    private void showDialogBox(int choice) {
+        String title;
+        String message;
+
+        switch (choice) {
+            case 1:
+                title = "Connection error";
+                message = "Could not get socket or output stream";
+                break;
+            case 2:
+                title = "Connection error";
+                message = "Could not write to this device";
+                break;
+            default:
+                return;
+        }
+
+        //show dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(Control.this);
+        builder
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
 
 }

@@ -224,7 +224,7 @@ public class Bluetooth extends AppCompatActivity {
 
     }
 
-    //check if the permissions where granted act accordingly
+    //check if the permissions where granted, act accordingly
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
