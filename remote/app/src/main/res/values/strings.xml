@@ -3,4 +3,17 @@
     <string name="bluetooth_connect">Connect</string>
     <string name="bluetooth_disconnect">Disconnect</string>
     <string name="connected_device">"Connected device: "</string>
+    <string name="microphone">Microphone</string>
+    <string name="control">Control</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="home">Home</string>
+    <string name="left">left</string>
+    <string name="straight">straight</string>
+    <string name="right">right</string>
+    <string name="forward">forward</string>
+    <string name="backward">backward</string>
+    <string name="button_start_recording">Start Recording</string>
+    <string name="button_stop_recording">Stop Recording</string>
+    <string name="start_recording_message">Recording started</string>
+    <string name="stop_recording_message">Recording stopped</string>
 </resources>

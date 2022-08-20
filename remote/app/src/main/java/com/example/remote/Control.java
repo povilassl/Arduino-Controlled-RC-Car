@@ -28,10 +28,10 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control);
 
-        //init and assing variable
+        //init and assign variable
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        //set dashboard selected
+        //set control selected
         bottomNavigationView.setSelectedItemId(R.id.control);
 
         //perform item selected listener
@@ -49,15 +49,16 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.control:
-
+                        return true;
+                    case R.id.microphone:
+                        startActivity(new Intent(getApplicationContext(), Microphone.class));
+                        overridePendingTransition(0, 0);
                         return true;
 
                 }
                 return false;
             }
         });
-
-        //tesing
 
 
         //get socket and set output stream

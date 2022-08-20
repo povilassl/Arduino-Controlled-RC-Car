@@ -53,7 +53,7 @@ public class Bluetooth extends AppCompatActivity {
         //init and assign variable
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        //set dashboard selected
+        //set bluetooth selected
         bottomNavigationView.setSelectedItemId(R.id.bluetooth);
 
         //perform item selected listener
@@ -70,6 +70,10 @@ public class Bluetooth extends AppCompatActivity {
                         return true;
                     case R.id.control:
                         startActivity(new Intent(getApplicationContext(), Control.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.microphone:
+                        startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
 

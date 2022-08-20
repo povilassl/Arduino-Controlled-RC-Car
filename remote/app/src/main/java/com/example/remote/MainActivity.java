@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //init and assing variable
+        //init and assign variable
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         //set home selected
@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.control:
                         startActivity(new Intent(getApplicationContext(), Control.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.microphone:
+                        startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
                 }

@@ -27,7 +27,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"
-                android:text="left" />
+                android:text="@string/left" />
 
             <Button
                 android:id="@+id/button_straight"
@@ -36,7 +36,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"
-                android:text="straight" />
+                android:text="@string/straight" />
 
             <Button
                 android:id="@+id/button_right"
@@ -44,7 +44,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="5dp"
                 android:layout_weight="1"
-                android:text="right" />
+                android:text="@string/right" />
         </LinearLayout>
 
         <Button
@@ -53,7 +53,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="forward" />
+            android:text="@string/forward" />
 
         <Button
             android:id="@+id/button_backward"
@@ -61,7 +61,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="backward" />
+            android:text="@string/backward" />
 
 
     </LinearLayout>

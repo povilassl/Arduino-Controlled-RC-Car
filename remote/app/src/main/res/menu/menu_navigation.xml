@@ -3,19 +3,23 @@
 
     <item
         android:id="@+id/home"
-        android:title="Home"
+        android:title="@string/home"
         android:icon="@drawable/ic_home"/>
 
     <item
         android:id="@+id/bluetooth"
-        android:title="Bluetooth"
+        android:title="@string/bluetooth"
         android:icon="@drawable/ic_bluetooth"/>
 
     <item
         android:id="@+id/control"
-        android:title="Control"
+        android:title="@string/control"
         android:icon="@drawable/ic_control"/>
 
+    <item
+        android:id="@+id/microphone"
+        android:title="@string/microphone"
+        android:icon="@drawable/ic_microphone"/>
 
 
 </menu>
