@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -14,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,12 +39,11 @@ public class Bluetooth extends AppCompatActivity {
 
     TextView textView;
     ListView listView;
-    BluetoothAdapter bluetoothAdapter;
-    BluetoothManager bluetoothManager;
     List savedList;
     Set<BluetoothDevice> pairedDevices;
     Integer selectedDeviceIndex;
     private BluetoothSocket _socket;
+    private boolean permissionGranted = false;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     @Override
@@ -87,12 +88,14 @@ public class Bluetooth extends AppCompatActivity {
 
         //getting devices into listview
         listView = findViewById(R.id.devicesListView);
-        bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        bluetoothAdapter = bluetoothManager.getAdapter();
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
-        //TODO: alert box for permission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("TAG", "Missing BLUETOOTH_CONNECT permission");
+
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT
+            }, 1);
             return;
         }
 
@@ -121,17 +124,21 @@ public class Bluetooth extends AppCompatActivity {
 
     public void bluetoothConnect(View view) {
 
+        //checking permissions
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT
+            }, 1);
+            return;
+        }
+
         //create temp list to get device by index
         List<BluetoothDevice> tmpList = new ArrayList<>(pairedDevices);
         BluetoothDevice device = tmpList.get(selectedDeviceIndex);
         String deviceName = tmpList.get(selectedDeviceIndex).toString();
 
+
         try {
-            //checking permissions, TODO: alert box for permissions
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("Tag", "permissions not granted");
-                return;
-            }
 
             //if socket is already connected, disconnect, do it in 2 steps because otherwise it throws exception
             if (_socket != null) {
@@ -158,22 +165,9 @@ public class Bluetooth extends AppCompatActivity {
             updateText(true);
 
         } catch (Exception e) {
-            Log.d("Tag", "Error connecting to device \"" + deviceName + "\"");
 
-            //show dialog
-            AlertDialog.Builder builder = new AlertDialog.Builder(Bluetooth.this);
-            builder
-                    .setTitle("Connecting to " + device.getName())
-                    .setMessage("Error: couldn't connect to this device")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            //show dialog with info
+            showDialogBox(1);
 
             //update view - false - device failed to connect
             updateText(false);
@@ -182,10 +176,18 @@ public class Bluetooth extends AppCompatActivity {
 
     public void bluetoothDisconnect(View view) {
 
+        //checking permissions
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.BLUETOOTH_CONNECT
+            }, 1);
+            return;
+        }
+
         String deviceName = savedList.get(selectedDeviceIndex).toString();
 
         try {
-            //check if connected
+            //if not connected, do nothing
             if (_socket != null && _socket.isConnected()) {
 
                 //closing and setting global to null
@@ -193,11 +195,16 @@ public class Bluetooth extends AppCompatActivity {
                 ((MyApplication) this.getApplication()).setConnectedSocket(null);
 
                 Log.d("Tag", "Successfully disconnected from device \"" + deviceName + "\"");
+                updateText(false);
 
             }
 
         } catch (Exception e) {
             Log.d("Tag", "Error disconnecting from device \"" + deviceName + "\"");
+
+            //show dialog with info
+            showDialogBox(2);
+
         }
     }
 
@@ -205,21 +212,75 @@ public class Bluetooth extends AppCompatActivity {
 
         String text = "Connected: ";
 
+        //flag means there is a connected device
         if (flag) {
-
             String deviceName = savedList.get(selectedDeviceIndex).toString();
-            deviceName = "my long device name";
-
-            //TODO: check if possible to measure width
-            if(deviceName.length() > 10){
-                deviceName = deviceName.substring(0, 8).concat("...");
-            }
             text = text.concat(deviceName);
         } else {
             text = text.concat("none");
         }
 
         textView.setText(text);
+
+    }
+
+    //check if the permissions where granted act accordingly
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    //restart activity to get list
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+                } else {
+                    showDialogBox(3);
+                }
+                return;
+        }
+    }
+
+
+    //show custom dialog box based on choice of error provided
+    private void showDialogBox(int choice) {
+        String title;
+        String message;
+
+        switch (choice) {
+            case 1:
+                title = "Connection error";
+                message = "Could not connect to this device";
+                break;
+            case 2:
+                title = "Connection error";
+                message = "Could not disconnect from this device";
+                break;
+            case 3:
+                title = "Permissions";
+                message = "This Activity can not run without previously requested permissions. " +
+                        "Please allow then in your settings";
+                break;
+            default:
+                return;
+        }
+
+        //show dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(Bluetooth.this);
+        builder
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
     }
 }
