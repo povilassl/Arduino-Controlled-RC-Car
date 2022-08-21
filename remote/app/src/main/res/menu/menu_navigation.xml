@@ -21,5 +21,9 @@
         android:title="@string/title_activity_controller_horizontal"
         android:icon="@drawable/ic_control"/>
 
+    <item
+        android:id="@+id/tilt"
+        android:title="@string/tilt"
+        android:icon="@drawable/ic_tilt"/>
 
 </menu>

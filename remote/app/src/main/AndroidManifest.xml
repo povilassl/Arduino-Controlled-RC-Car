@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Remote"
         tools:targetApi="31">
         <activity
+            android:name=".Tilt"
+            android:exported="false" />
+        <activity
             android:name=".Controller_horizontal"
             android:exported="false" />
         <activity

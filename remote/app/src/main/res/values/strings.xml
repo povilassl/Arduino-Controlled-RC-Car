@@ -18,4 +18,5 @@
     <string name="title_activity_controller_horizontal">Controller</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="tilt">Tilt</string>
 </resources>

@@ -74,6 +74,10 @@ public class Bluetooth extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
                         overridePendingTransition(0, 0);
                         return true;
+                    case R.id.tilt:
+                        startActivity(new Intent(getApplicationContext(), Tilt.class));
+                        overridePendingTransition(0, 0);
+                        return true;
 
                 }
                 return false;
@@ -135,9 +139,6 @@ public class Bluetooth extends AppCompatActivity {
         String deviceName = tmpList.get(selectedDeviceIndex).toString();
 
 
-        //start gif
-
-
         try {
 
             //if socket is already connected, disconnect, do it in 2 steps because otherwise it throws exception
@@ -171,8 +172,6 @@ public class Bluetooth extends AppCompatActivity {
 
             //update view - false - device failed to connect
             updateText(false);
-        }finally {
-            //end gif
         }
     }
 

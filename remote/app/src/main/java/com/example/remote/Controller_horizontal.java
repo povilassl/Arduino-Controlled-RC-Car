@@ -55,6 +55,10 @@ public class Controller_horizontal extends AppCompatActivity implements View.OnT
                         return true;
                     case R.id.controller_horizontal:
                         return true;
+                    case R.id.tilt:
+                        startActivity(new Intent(getApplicationContext(), Tilt.class));
+                        overridePendingTransition(0, 0);
+                        return true;
                 }
                 return false;
             }

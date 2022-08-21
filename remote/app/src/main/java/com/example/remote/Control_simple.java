@@ -54,6 +54,10 @@ public class Control_simple extends AppCompatActivity implements View.OnClickLis
                         startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
                         overridePendingTransition(0, 0);
                         return true;
+                    case R.id.tilt:
+                        startActivity(new Intent(getApplicationContext(), Tilt.class));
+                        overridePendingTransition(0, 0);
+                        return true;
 
                 }
                 return false;
