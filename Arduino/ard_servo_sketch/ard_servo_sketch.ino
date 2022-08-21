@@ -33,8 +33,11 @@ void setup() {
   goingForward = false;
 }
 
-void stopMotors(){
-  frontServo.write(stopFront);
+void stopMotors(int choice){
+
+  if(choice == 1){
+    frontServo.write(stopFront);  
+  }
 
   if(goingForward){
     backward();
@@ -55,7 +58,7 @@ void backward(){
   if(goingForward){
     goingForward = false;
   }else{
-    delay(100);
+    delay(200);
   }
   
   backMotor.write(goB);  
@@ -105,7 +108,10 @@ void loop(){
           straight();
           break;
         case 'C':
-          stopMotors();
+          stopMotors(1); // choice 1 - stop front too
+          break;
+        case 'X':
+          stopMotors(2); // choice 2 - stop back only
           break;
         default:
         Serial.write("error\n");

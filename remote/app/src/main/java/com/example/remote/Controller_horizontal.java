@@ -155,11 +155,11 @@ public class Controller_horizontal extends AppCompatActivity implements View.OnT
             switch (view.getId()) {
                 case R.id.controller_button_up:
                 case R.id.controller_button_down:
-                    command = 'C';  //stop
+                    command = 'X';  //stop back
                     break;
                 case R.id.controller_button_left:
                 case R.id.controller_button_right:
-                    command = 'S'; // Straight
+                    command = 'S'; // set front straight
                     break;
                 default:
                     break;
