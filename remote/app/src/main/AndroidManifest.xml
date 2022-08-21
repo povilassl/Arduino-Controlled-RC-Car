@@ -2,12 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.remote">
-
-
-    <!--    for recording-->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!--    for bluetooth-->
+    <!-- for recording -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- for bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
@@ -23,10 +19,13 @@
         android:theme="@style/Theme.Remote"
         tools:targetApi="31">
         <activity
+            android:name=".Controller_horizontal"
+            android:exported="false" />
+        <activity
             android:name=".Microphone"
             android:exported="false" />
         <activity
-            android:name=".Control"
+            android:name=".Control_simple"
             android:exported="false" />
         <activity
             android:name=".Bluetooth"

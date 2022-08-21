@@ -15,4 +15,7 @@
     <string name="button_stop_recording">Stop Recording</string>
     <string name="start_recording_message">Recording started</string>
     <string name="stop_recording_message">Recording stopped</string>
+    <string name="title_activity_controller_horizontal">Controller</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>

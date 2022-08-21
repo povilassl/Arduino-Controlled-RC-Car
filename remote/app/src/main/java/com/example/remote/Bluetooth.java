@@ -14,8 +14,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -33,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.ConsoleHandler;
 
 public class Bluetooth extends AppCompatActivity {
 
@@ -63,18 +60,18 @@ public class Bluetooth extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
 
-//                    case R.id.home:
-//                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//                        overridePendingTransition(0, 0);
-//                        return true;
                     case R.id.bluetooth:
                         return true;
                     case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control.class));
+                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.controller_horizontal:
+                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
                         overridePendingTransition(0, 0);
                         return true;
 
@@ -138,6 +135,9 @@ public class Bluetooth extends AppCompatActivity {
         String deviceName = tmpList.get(selectedDeviceIndex).toString();
 
 
+        //start gif
+
+
         try {
 
             //if socket is already connected, disconnect, do it in 2 steps because otherwise it throws exception
@@ -171,6 +171,8 @@ public class Bluetooth extends AppCompatActivity {
 
             //update view - false - device failed to connect
             updateText(false);
+        }finally {
+            //end gif
         }
     }
 
@@ -264,7 +266,9 @@ public class Bluetooth extends AppCompatActivity {
                         "Please allow then in your settings";
                 break;
             default:
-                return;
+                title = "Error";
+                message = "Error";
+                break;
         }
 
         //show dialog

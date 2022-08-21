@@ -11,11 +11,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -25,16 +22,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.w3c.dom.Text;
-
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,19 +55,20 @@ public class Microphone extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-//                    case R.id.home:
-//                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//                        overridePendingTransition(0, 0);
-//                        return true;
+
                     case R.id.bluetooth:
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control.class));
+                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.microphone:
+                        return true;
+                    case R.id.controller_horizontal:
+                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
+                        overridePendingTransition(0, 0);
                         return true;
                 }
                 return false;
@@ -289,7 +282,9 @@ public class Microphone extends AppCompatActivity {
                         "Please allow then in your settings";
                 break;
             default:
-                return;
+                title = "Error";
+                message = "Error";
+                break;
         }
 
         //show dialog

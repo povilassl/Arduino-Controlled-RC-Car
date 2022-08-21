@@ -4,8 +4,8 @@
 #define frontMotorPin 9
 #define backMotorPin 10
 
-#define goF 80
-#define goB 100
+#define goF 70
+#define goB 110
 
 #define turnL 60
 #define turnR 120

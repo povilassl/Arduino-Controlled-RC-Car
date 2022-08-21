@@ -10,17 +10,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
-public class Control extends AppCompatActivity implements View.OnClickListener {
+public class Control_simple extends AppCompatActivity implements View.OnClickListener {
 
     private DataOutputStream _outStream;
     private BluetoothSocket _socket;
@@ -42,10 +40,6 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
 
-//                    case R.id.home:
-//                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//                        overridePendingTransition(0, 0);
-//                        return true;
                     case R.id.bluetooth:
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
@@ -54,6 +48,10 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
                         return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.controller_horizontal:
+                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
                         overridePendingTransition(0, 0);
                         return true;
 
@@ -143,11 +141,13 @@ public class Control extends AppCompatActivity implements View.OnClickListener {
                 message = "Could not write to this device";
                 break;
             default:
-                return;
+                title = "Error";
+                message = "Error";
+                break;
         }
 
         //show dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(Control.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Control_simple.this);
         builder
                 .setTitle(title)
                 .setMessage(message)
