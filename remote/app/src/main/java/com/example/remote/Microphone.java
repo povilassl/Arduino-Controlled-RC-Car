@@ -63,10 +63,10 @@ public class Microphone extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.home:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(0, 0);
-                        return true;
+//                    case R.id.home:
+//                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+//                        overridePendingTransition(0, 0);
+//                        return true;
                     case R.id.bluetooth:
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
