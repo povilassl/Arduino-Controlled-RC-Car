@@ -15,9 +15,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,6 +45,7 @@ public class Bluetooth extends AppCompatActivity {
     private BluetoothSocket _socket;
     private boolean permissionGranted = false;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,21 +127,13 @@ public class Bluetooth extends AppCompatActivity {
 
     }
 
-    public void bluetoothConnect(View view) {
 
-        //checking permissions
-        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.BLUETOOTH_CONNECT
-            }, 1);
-            return;
-        }
+    public void bluetoothConnect(View view) {
 
         //create temp list to get device by index
         List<BluetoothDevice> tmpList = new ArrayList<>(pairedDevices);
         BluetoothDevice device = tmpList.get(selectedDeviceIndex);
         String deviceName = tmpList.get(selectedDeviceIndex).toString();
-
 
         try {
 
@@ -150,29 +146,15 @@ public class Bluetooth extends AppCompatActivity {
                 }
             }
 
-            //initialize socket
-            _socket = device.createRfcommSocketToServiceRecord(MY_UUID);
-
-            //connect to socket
-            _socket.connect();
-
-            if (_socket != null && _socket.isConnected()) {
-                //setting global connected socket
-                ((MyApplication) this.getApplication()).setConnectedSocket(_socket);
-                Log.d("Tag", "Successfully connected to device \"" + deviceName + "\"");
-            }
-
-            //update view - true because device connected succesfully
-            updateText(true);
+            //starting new thread to not stop main
+            BluetoothConnectThread thread = new BluetoothConnectThread(_socket, device, deviceName);
+            thread.start();
 
         } catch (Exception e) {
-
-            //show dialog with info
-            showDialogBox(1);
-
-            //update view - false - device failed to connect
-            updateText(false);
+            e.printStackTrace();
         }
+
+
     }
 
     public void bluetoothDisconnect(View view) {
@@ -285,5 +267,79 @@ public class Bluetooth extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
 
+    }
+
+    class BluetoothConnectThread extends Thread {
+        BluetoothSocket socket;
+        BluetoothDevice device;
+        String name;
+
+        BluetoothConnectThread(BluetoothSocket socket, BluetoothDevice device, String name) {
+            this.socket = socket;
+            this.device = device;
+            this.name = name;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                //checking permissions
+                if (!(ContextCompat.checkSelfPermission(Bluetooth.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
+                    ActivityCompat.requestPermissions(Bluetooth.this, new String[]{
+                            Manifest.permission.BLUETOOTH_CONNECT
+                    }, 1);
+                    return;
+                }
+
+                //initialize socket
+                socket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
+                //stop user interactions while connecting -  on UI thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        //gif starts spinning
+                        findViewById(R.id.loading_gif).setVisibility(View.VISIBLE);
+                    }
+                });
+
+                //connect to socket
+                socket.connect();
+
+                //set global socket
+                ((MyApplication) Bluetooth.this.getApplication()).setConnectedSocket(socket);
+                _socket = socket;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    //update text depending of the outcome
+                    if (socket != null && socket.isConnected()) {
+                        updateText(true);
+                    } else {
+                        updateText(false);
+
+                        //show dialog with info
+                        showDialogBox(1);
+                    }
+
+                    //set window back to interactive
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+                    //gif stops spinning
+                    findViewById(R.id.loading_gif).setVisibility(View.GONE);
+
+                }
+            });
+        }
     }
 }
