@@ -42,24 +42,19 @@ public class Tilt extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
+                int id = item.getItemId();
 
-                    case R.id.bluetooth:
-                        startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.controller:
-                        startActivity(new Intent(getApplicationContext(), Controller.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.microphone:
-                        startActivity(new Intent(getApplicationContext(), Microphone.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.tilt:
-                        return true;
-
+                if(id == R.id.bluetooth){
+                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+                }else if (id == R.id.controller){
+                    startActivity(new Intent(getApplicationContext(), Controller.class));
+                }else if (id == R.id.microphone){
+                    startActivity(new Intent(getApplicationContext(), Microphone.class));
+                }else if (id == R.id.tilt){
+                    return false;
                 }
+
+                overridePendingTransition(0, 0);
                 return false;
             }
         });

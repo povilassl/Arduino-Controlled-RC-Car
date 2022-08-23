@@ -54,23 +54,19 @@ public class Microphone extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
+                int id = item.getItemId();
 
-                    case R.id.bluetooth:
-                        startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.controller:
-                        startActivity(new Intent(getApplicationContext(), Controller.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.microphone:
-                        return true;
-                    case R.id.tilt:
-                        startActivity(new Intent(getApplicationContext(), Tilt.class));
-                        overridePendingTransition(0, 0);
-                        return true;
+                if(id == R.id.bluetooth){
+                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+                }else if (id == R.id.controller){
+                    startActivity(new Intent(getApplicationContext(), Controller.class));
+                }else if (id == R.id.microphone){
+                    return false;
+                }else if (id == R.id.tilt){
+                    startActivity(new Intent(getApplicationContext(), Tilt.class));
                 }
+
+                overridePendingTransition(0, 0);
                 return false;
             }
         });

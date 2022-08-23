@@ -11,19 +11,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,12 +34,11 @@ public class Bluetooth extends AppCompatActivity {
 
     TextView textView;
     ListView listView;
-    List savedList;
+    List<String> savedList;
     Set<BluetoothDevice> pairedDevices;
     Integer selectedDeviceIndex;
     private BluetoothSocket _socket;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,29 +52,22 @@ public class Bluetooth extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.bluetooth);
 
         //perform item selected listener
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
 
-                    case R.id.bluetooth:
-                        return true;
-                    case R.id.controller:
-                        startActivity(new Intent(getApplicationContext(), Controller.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.microphone:
-                        startActivity(new Intent(getApplicationContext(), Microphone.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.tilt:
-                        startActivity(new Intent(getApplicationContext(), Tilt.class));
-                        overridePendingTransition(0, 0);
-                        return true;
+            int id = item.getItemId();
 
-                }
+            if (id == R.id.bluetooth) {
                 return false;
+            } else if (id == R.id.controller) {
+                startActivity(new Intent(getApplicationContext(), Controller.class));
+            } else if (id == R.id.microphone) {
+                startActivity(new Intent(getApplicationContext(), Microphone.class));
+            } else if (id == R.id.tilt) {
+                startActivity(new Intent(getApplicationContext(), Tilt.class));
             }
+
+            overridePendingTransition(0, 0);
+            return false;
         });
 
         //set text view
@@ -92,49 +80,35 @@ public class Bluetooth extends AppCompatActivity {
 
 
         if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.BLUETOOTH_CONNECT
-            }, 1);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.BLUETOOTH_CONNECT
+                }, 1);
+            }
             return;
         }
 
         pairedDevices = bluetoothAdapter.getBondedDevices();
-        savedList = new ArrayList();
+        savedList = new ArrayList<>();
 
         for (BluetoothDevice bt : pairedDevices) {
             savedList.add(bt.getName());
         }
 
-        Adapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, savedList);
-        listView.setAdapter((ListAdapter) adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, savedList);
+        listView.setAdapter(adapter);
 
 
         //setting on click listener to get chosen device
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedDeviceIndex = i;
-            }
-        });
+        listView.setOnItemClickListener((adapterView, view, i, l) -> selectedDeviceIndex = i);
 
         updateText(false);
-        
+
         Button btConnect = (Button) findViewById(R.id.bluetooth_connect);
         Button btDisconnect = (Button) findViewById(R.id.bluetooth_disconnect);
 
-        btConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bluetoothConnect(view); // pass view JIC - not used
-            }
-        });
-
-        btDisconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bluetoothDisconnect(view); // pass view JIC - not used
-            }
-        });
+        btConnect.setOnClickListener(this::bluetoothConnect);
+        btDisconnect.setOnClickListener(this::bluetoothDisconnect);
 
     }
 
@@ -179,13 +153,15 @@ public class Bluetooth extends AppCompatActivity {
 
         //checking permissions
         if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.BLUETOOTH_CONNECT
-            }, 1);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.BLUETOOTH_CONNECT
+                }, 1);
+            }
             return;
         }
 
-        String deviceName = savedList.get(selectedDeviceIndex).toString();
+        String deviceName = savedList.get(selectedDeviceIndex);
 
         try {
 
@@ -212,7 +188,7 @@ public class Bluetooth extends AppCompatActivity {
 
         //flag means there is a connected device
         if (flag) {
-            String deviceName = savedList.get(selectedDeviceIndex).toString();
+            String deviceName = savedList.get(selectedDeviceIndex);
             text = text.concat(deviceName);
         } else {
             text = text.concat("none");
@@ -224,20 +200,19 @@ public class Bluetooth extends AppCompatActivity {
 
     //check if the permissions where granted, act accordingly
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 1:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    //restart activity to get list
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                } else {
-                    showDialogBox(3);
-                }
-                return;
+        if (requestCode == 1) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                //restart activity to get list
+                finish();
+                startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+            } else {
+                showDialogBox(3);
+            }
         }
     }
 
@@ -276,11 +251,7 @@ public class Bluetooth extends AppCompatActivity {
         builder
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
+                .setPositiveButton("Ok", (dialogInterface, i) -> {
                 });
 
         AlertDialog dialog = builder.create();
@@ -305,9 +276,11 @@ public class Bluetooth extends AppCompatActivity {
 
                 //checking permissions
                 if (!(ContextCompat.checkSelfPermission(Bluetooth.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
-                    ActivityCompat.requestPermissions(Bluetooth.this, new String[]{
-                            Manifest.permission.BLUETOOTH_CONNECT
-                    }, 1);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(Bluetooth.this, new String[]{
+                                Manifest.permission.BLUETOOTH_CONNECT
+                        }, 1);
+                    }
                     return;
                 }
 
@@ -315,14 +288,11 @@ public class Bluetooth extends AppCompatActivity {
                 socket = device.createRfcommSocketToServiceRecord(MY_UUID);
 
                 //stop user interactions while connecting -  on UI thread
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        //gif starts spinning
-                        findViewById(R.id.loading_gif).setVisibility(View.VISIBLE);
-                    }
+                runOnUiThread(() -> {
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    //gif starts spinning
+                    findViewById(R.id.loading_gif).setVisibility(View.VISIBLE);
                 });
 
                 //connect to socket
@@ -336,28 +306,22 @@ public class Bluetooth extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+            runOnUiThread(() -> {
+                //update text depending of the outcome
+                if (socket != null && socket.isConnected()) {
+                    updateText(true);
+                } else {
+                    updateText(false);
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    //update text depending of the outcome
-                    if (socket != null && socket.isConnected()) {
-                        updateText(true);
-                    } else {
-                        updateText(false);
-
-                        //show dialog with info
-                        showDialogBox(1);
-                    }
-
-                    //set window back to interactive
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-                    //gif stops spinning
-                    findViewById(R.id.loading_gif).setVisibility(View.GONE);
-
+                    //show dialog with info
+                    showDialogBox(1);
                 }
+
+                //set window back to interactive
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+                //gif stops spinning
+                findViewById(R.id.loading_gif).setVisibility(View.GONE);
             });
         }
     }
