@@ -45,11 +45,11 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
+                    case R.id.controller:
+                        return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.controller:
                         return true;
                     case R.id.tilt:
                         startActivity(new Intent(getApplicationContext(), Tilt.class));

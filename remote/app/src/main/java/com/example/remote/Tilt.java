@@ -48,12 +48,12 @@ public class Tilt extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.microphone:
-                        startActivity(new Intent(getApplicationContext(), Microphone.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.controller:
                         startActivity(new Intent(getApplicationContext(), Controller.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.microphone:
+                        startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.tilt:

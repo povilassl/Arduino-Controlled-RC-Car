@@ -7,14 +7,14 @@
         android:icon="@drawable/ic_bluetooth"/>
 
     <item
-        android:id="@+id/microphone"
-        android:title="@string/microphone"
-        android:icon="@drawable/ic_microphone"/>
-
-    <item
         android:id="@+id/controller"
         android:title="@string/title_activity_controller_horizontal"
         android:icon="@drawable/ic_control"/>
+
+    <item
+        android:id="@+id/microphone"
+        android:title="@string/microphone"
+        android:icon="@drawable/ic_microphone"/>
 
     <item
         android:id="@+id/tilt"

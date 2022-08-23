@@ -43,19 +43,19 @@
         android:textAlignment="center">
 
         <Button
+            android:id="@+id/bluetooth_connect"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
-            android:onClick="bluetoothConnect"
             android:text="@string/bluetooth_connect" />
 
         <Button
+            android:id="@+id/bluetooth_disconnect"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:onClick="bluetoothDisconnect"
             android:text="@string/bluetooth_disconnect" />
     </LinearLayout>
 

@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,12 +64,12 @@ public class Bluetooth extends AppCompatActivity {
 
                     case R.id.bluetooth:
                         return true;
-                    case R.id.microphone:
-                        startActivity(new Intent(getApplicationContext(), Microphone.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.controller:
                         startActivity(new Intent(getApplicationContext(), Controller.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.microphone:
+                        startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.tilt:
@@ -117,6 +118,23 @@ public class Bluetooth extends AppCompatActivity {
         });
 
         updateText(false);
+        
+        Button btConnect = (Button) findViewById(R.id.bluetooth_connect);
+        Button btDisconnect = (Button) findViewById(R.id.bluetooth_disconnect);
+
+        btConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bluetoothConnect(view); // pass view JIC - not used
+            }
+        });
+
+        btDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bluetoothDisconnect(view); // pass view JIC - not used
+            }
+        });
 
     }
 
