@@ -15,8 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +41,6 @@ public class Bluetooth extends AppCompatActivity {
     Set<BluetoothDevice> pairedDevices;
     Integer selectedDeviceIndex;
     private BluetoothSocket _socket;
-    private boolean permissionGranted = false;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
 
@@ -66,16 +63,12 @@ public class Bluetooth extends AppCompatActivity {
 
                     case R.id.bluetooth:
                         return true;
-                    case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.controller_horizontal:
-                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
+                    case R.id.controller:
+                        startActivity(new Intent(getApplicationContext(), Controller.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.tilt:
@@ -159,6 +152,13 @@ public class Bluetooth extends AppCompatActivity {
 
     public void bluetoothDisconnect(View view) {
 
+
+        //if no device connected
+        if (_socket == null || !_socket.isConnected()) {
+            showDialogBox(4);
+            return;
+        }
+
         //checking permissions
         if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(this, new String[]{
@@ -170,17 +170,14 @@ public class Bluetooth extends AppCompatActivity {
         String deviceName = savedList.get(selectedDeviceIndex).toString();
 
         try {
-            //if not connected, do nothing
-            if (_socket != null && _socket.isConnected()) {
 
-                //closing and setting global to null
-                _socket.close();
-                ((MyApplication) this.getApplication()).setConnectedSocket(null);
+            //closing and setting global to null
+            _socket.close();
+            ((MyApplication) this.getApplication()).setConnectedSocket(null);
 
-                Log.d("Tag", "Successfully disconnected from device \"" + deviceName + "\"");
-                updateText(false);
+            Log.d("Tag", "Successfully disconnected from device \"" + deviceName + "\"");
+            updateText(false);
 
-            }
 
         } catch (Exception e) {
             Log.d("Tag", "Error disconnecting from device \"" + deviceName + "\"");
@@ -245,6 +242,10 @@ public class Bluetooth extends AppCompatActivity {
                 title = "Permissions";
                 message = "This Activity can not run without previously requested permissions. " +
                         "Please allow then in your settings";
+                break;
+            case 4:
+                title = "Connection";
+                message = "No device currently connected";
                 break;
             default:
                 title = "Error";

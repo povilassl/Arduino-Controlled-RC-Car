@@ -17,9 +17,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         //we can set default launcher to bluetooth (in manifest), but I want to keep mainactivity JIC
-        //move to bluetooth
-        finish();
-        startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+        //stop this activity and move to bluetooth
+//        finish();
+//        startActivity(new Intent(getApplicationContext(), Bluetooth.class));
 
     }
 }

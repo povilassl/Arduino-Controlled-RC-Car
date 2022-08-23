@@ -21,7 +21,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.DataOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Tilt extends AppCompatActivity {
@@ -49,16 +48,12 @@ public class Tilt extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.controller_horizontal:
-                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
+                    case R.id.controller:
+                        startActivity(new Intent(getApplicationContext(), Controller.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.tilt:
@@ -222,12 +217,12 @@ public class Tilt extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
 
-        //close activity, otherwise it continues sending data
-        finish();
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+
     }
 }
 

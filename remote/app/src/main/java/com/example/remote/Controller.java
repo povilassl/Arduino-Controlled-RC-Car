@@ -19,7 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 
-public class Controller_horizontal extends AppCompatActivity implements View.OnTouchListener {
+public class Controller extends AppCompatActivity implements View.OnTouchListener {
 
     private DataOutputStream _outStream;
 
@@ -27,13 +27,13 @@ public class Controller_horizontal extends AppCompatActivity implements View.OnT
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_controller_horizontal);
+        setContentView(R.layout.activity_controller);
 
         //init and assign variable
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         //set microphone selected
-        bottomNavigationView.setSelectedItemId(R.id.controller_horizontal);
+        bottomNavigationView.setSelectedItemId(R.id.controller);
 
         //perform item selected listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -45,15 +45,11 @@ public class Controller_horizontal extends AppCompatActivity implements View.OnT
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.microphone:
                         startActivity(new Intent(getApplicationContext(), Microphone.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.controller_horizontal:
+                    case R.id.controller:
                         return true;
                     case R.id.tilt:
                         startActivity(new Intent(getApplicationContext(), Tilt.class));
@@ -112,7 +108,7 @@ public class Controller_horizontal extends AppCompatActivity implements View.OnT
         }
 
         //show dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(Controller_horizontal.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Controller.this);
         builder
                 .setTitle(title)
                 .setMessage(message)

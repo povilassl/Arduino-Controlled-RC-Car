@@ -60,14 +60,10 @@ public class Microphone extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), Bluetooth.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.control:
-                        startActivity(new Intent(getApplicationContext(), Control_simple.class));
-                        overridePendingTransition(0, 0);
-                        return true;
                     case R.id.microphone:
                         return true;
-                    case R.id.controller_horizontal:
-                        startActivity(new Intent(getApplicationContext(), Controller_horizontal.class));
+                    case R.id.controller:
+                        startActivity(new Intent(getApplicationContext(), Controller.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.tilt:

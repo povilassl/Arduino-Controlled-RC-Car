@@ -22,19 +22,13 @@
             android:name=".Tilt"
             android:exported="false" />
         <activity
-            android:name=".Controller_horizontal"
+            android:name=".Controller"
             android:exported="false" />
         <activity
             android:name=".Microphone"
             android:exported="false" />
         <activity
-            android:name=".Control_simple"
-            android:exported="false" />
-        <activity
             android:name=".Bluetooth"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
