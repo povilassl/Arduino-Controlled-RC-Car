@@ -302,4 +302,16 @@ public class Microphone extends AppCompatActivity {
             showDialogBox(3);
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //try stopping the car, does nothing if not connected
+        try {
+            _outStream.writeChar('S');
+            _outStream.writeChar('X');
+        } catch (Exception e) {
+        }
+    }
 }

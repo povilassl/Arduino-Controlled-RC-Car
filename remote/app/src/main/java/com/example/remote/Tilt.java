@@ -1,12 +1,6 @@
 package com.example.remote;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,8 +8,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -39,24 +36,21 @@ public class Tilt extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.tilt);
 
         //perform item selected listener
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-                if(id == R.id.bluetooth){
-                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                }else if (id == R.id.controller){
-                    startActivity(new Intent(getApplicationContext(), Controller.class));
-                }else if (id == R.id.microphone){
-                    startActivity(new Intent(getApplicationContext(), Microphone.class));
-                }else if (id == R.id.tilt){
-                    return false; //same page
-                }
-
-                overridePendingTransition(0, 0);
-                return false;
+            if (id == R.id.bluetooth) {
+                startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+            } else if (id == R.id.controller) {
+                startActivity(new Intent(getApplicationContext(), Controller.class));
+            } else if (id == R.id.microphone) {
+                startActivity(new Intent(getApplicationContext(), Microphone.class));
+            } else if (id == R.id.tilt) {
+                return false; //same page
             }
+
+            overridePendingTransition(0, 0);
+            return false;
         });
 
         try {
@@ -118,30 +112,30 @@ public class Tilt extends AppCompatActivity {
                 //front command
                 if (x < -0.2) {
                     commandFront = 'R';
-                    commands_text.concat("Right");
+                    commands_text = commands_text.concat("Right");
                 } else if (x > 0.2) {
                     commandFront = 'L';
-                    commands_text.concat("Left");
-                } else {
+                    commands_text = commands_text.concat("Left");
+                } else if (x <= 0.2 && x >= -0.2) {
                     commandFront = 'S';
-                    commands_text.concat("Straight");
+                    commands_text = commands_text.concat("Straight");
                 }
 
                 //back command
                 if (y < -0.2) {
                     commandBack = 'F';
-                    commands_text.concat("Forward");
+                    commands_text = commands_text.concat("Forward");
                 } else if (y > 0.2) {
                     commandBack = 'B';
-                    commands_text.concat("Backward");
-                } else {
+                    commands_text = commands_text.concat("Backward");
+                } else if (y <= 0.2 && y >= -0.2){
                     commandBack = 'X';
-                    commands_text.concat("Stop");
+                    commands_text = commands_text.concat("Stop");
                 }
 
                 try {
 
-                    tilt_command.setText(commandFront + " : " + commandBack);
+                    tilt_command.setText(commands_text);
 
                     //minimize data to motors by checking if new commands are not equal to previously sent
                     if (commandFront != prevCommandFront)
@@ -200,11 +194,7 @@ public class Tilt extends AppCompatActivity {
         builder
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
+                .setPositiveButton("Ok", (dialogInterface, i) -> {
                 });
 
         AlertDialog dialog = builder.create();
@@ -212,12 +202,16 @@ public class Tilt extends AppCompatActivity {
 
     }
 
-
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
 
-
+        //try stopping the car, does nothing if not connected
+        try {
+            _outStream.writeChar('S');
+            _outStream.writeChar('X');
+        } catch (Exception e) {
+        }
     }
 }
 

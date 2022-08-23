@@ -11,7 +11,7 @@
 #define turnR 120
 #define turnS 90
 
-#define stopFront 100
+#define stopFront 90
 #define stopBack 90
   
 SoftwareSerial bluetoothSerial(0, 1); // RX, TX
@@ -38,30 +38,24 @@ void stopMotors(int choice){
   if(choice == 1){
     frontServo.write(stopFront);  
   }
-
-  if(goingForward){
-    backward();
-  }else{
+  
     backMotor.write(stopBack);
-  }
+
 }
 
 void forward(){
-  goingForward = true;
   backMotor.write(goF);
 }
 
 void backward(){
-  backMotor.write(stopBack);  
-
-  //if were going forward, rc stops, if not, the motor need a small pause, otherwise it won't work
-  if(goingForward){
-    goingForward = false;
-  }else{
-    delay(200);
-  }
   
-  backMotor.write(goB);  
+  backMotor.write(stopBack);
+  
+  for(int i=0; i<10000; i++){
+    for(int j=0;j<1000; j++){}
+  }
+
+  backMotor.write(goB);
 }
 
 void straight(){
@@ -82,9 +76,6 @@ void loop(){
       
       if (bluetoothSerial.available() > 0) {
       command = bluetoothSerial.read();
-  
-//      Serial.print(command, HEX);
-//      Serial.write("\n");
   
       //every other value is 0, so if so, return
       if(command == 0) {

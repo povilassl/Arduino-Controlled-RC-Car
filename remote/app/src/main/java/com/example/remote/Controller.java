@@ -155,4 +155,16 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
 
         return false;
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        //try stopping the car, does nothing if not connected
+        try {
+            _outStream.writeChar('S');
+            _outStream.writeChar('X');
+        } catch (Exception e) {
+        }
+    }
 }
