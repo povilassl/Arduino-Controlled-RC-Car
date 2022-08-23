@@ -1,14 +1,7 @@
 package com.example.remote;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,10 +12,14 @@ import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -51,24 +48,21 @@ public class Microphone extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.microphone);
 
         //perform item selected listener
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-                if(id == R.id.bluetooth){
-                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                }else if (id == R.id.controller){
-                    startActivity(new Intent(getApplicationContext(), Controller.class));
-                }else if (id == R.id.microphone){
-                    return false;
-                }else if (id == R.id.tilt){
-                    startActivity(new Intent(getApplicationContext(), Tilt.class));
-                }
-
-                overridePendingTransition(0, 0);
-                return false;
+            if (id == R.id.bluetooth) {
+                startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+            } else if (id == R.id.controller) {
+                startActivity(new Intent(getApplicationContext(), Controller.class));
+            } else if (id == R.id.microphone) {
+                return false; //same page
+            } else if (id == R.id.tilt) {
+                startActivity(new Intent(getApplicationContext(), Tilt.class));
             }
+
+            overridePendingTransition(0, 0);
+            return false;
         });
 
         try {
@@ -155,25 +149,22 @@ public class Microphone extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.button_recording).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
-                checkPermissions();
+        findViewById(R.id.button_recording).setOnTouchListener((v, motionEvent) -> {
+            checkPermissions();
 
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        speechRecognizer.stopListening();
-                        break;
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_UP:
+                    speechRecognizer.stopListening();
+                    break;
 
-                    case MotionEvent.ACTION_DOWN:
-                        textView.setText("");
-                        speechRecognizer.startListening(speechRecognizerIntent);
-                        textView.setHint("Listening...");
-                        break;
-                }
-
-                return false;
+                case MotionEvent.ACTION_DOWN:
+                    textView.setText("");
+                    speechRecognizer.startListening(speechRecognizerIntent);
+                    textView.setHint("Listening...");
+                    break;
             }
+
+            return false;
         });
 
     }
@@ -198,7 +189,7 @@ public class Microphone extends AppCompatActivity {
         List<String> commandsText = new ArrayList<>();
 
         //split input by into array of words (to iterate in order)
-        List<String> inputList = new ArrayList<String>(Arrays.asList(input.split(" ")));
+        List<String> inputList = new ArrayList<>(Arrays.asList(input.split(" ")));
 
         for (String str : inputList) {
             if (str.contains("forward") || str.equals("go")) {
@@ -236,25 +227,25 @@ public class Microphone extends AppCompatActivity {
 
         String text = "";
 
-        if(commandsText.isEmpty()){
+        if (commandsText.isEmpty()) {
             text = "none";
-        }else {
-            for (String str : commandsText){
+        } else {
+            for (String str : commandsText) {
                 text = text.concat(str + " ");
 
             }
         }
+        text = "Commands: ".concat(text);
 
-        textView.setText("Commands: " + text);
+        textView.setText(text);
 
         try {
-            for (Character c : commandsSend){
+            for (Character c : commandsSend) {
                 _outStream.writeChar(c);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("tag", e.toString());
             showDialogBox(2);
-            return;
         }
     }
 
@@ -288,11 +279,7 @@ public class Microphone extends AppCompatActivity {
         builder
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
+                .setPositiveButton("Ok", (dialogInterface, i) -> {
                 });
 
         AlertDialog dialog = builder.create();
@@ -302,21 +289,17 @@ public class Microphone extends AppCompatActivity {
 
     //check if the permissions where granted, act accordingly
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 1:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    //restart activity to get list
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), Microphone.class));
-                } else {
-                    showDialogBox(3);
-                }
-                return;
+        // If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            //restart activity to get list
+            finish();
+            startActivity(new Intent(getApplicationContext(), Microphone.class));
+        } else {
+            showDialogBox(3);
         }
     }
-
 }

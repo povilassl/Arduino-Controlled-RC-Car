@@ -51,7 +51,7 @@ public class Tilt extends AppCompatActivity {
                 }else if (id == R.id.microphone){
                     startActivity(new Intent(getApplicationContext(), Microphone.class));
                 }else if (id == R.id.tilt){
-                    return false;
+                    return false; //same page
                 }
 
                 overridePendingTransition(0, 0);

@@ -37,7 +37,6 @@ public class Bluetooth extends AppCompatActivity {
     List<String> savedList;
     Set<BluetoothDevice> pairedDevices;
     Integer selectedDeviceIndex;
-    private BluetoothSocket _socket;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     @Override
@@ -53,11 +52,10 @@ public class Bluetooth extends AppCompatActivity {
 
         //perform item selected listener
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-
             int id = item.getItemId();
 
             if (id == R.id.bluetooth) {
-                return false;
+                return false; //same page
             } else if (id == R.id.controller) {
                 startActivity(new Intent(getApplicationContext(), Controller.class));
             } else if (id == R.id.microphone) {
@@ -75,10 +73,12 @@ public class Bluetooth extends AppCompatActivity {
 
         //getting devices into listview
         listView = findViewById(R.id.devicesListView);
+
+        //BT manager and adapter
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
-
+        //check permissions
         if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ActivityCompat.requestPermissions(this, new String[]{
@@ -88,6 +88,7 @@ public class Bluetooth extends AppCompatActivity {
             return;
         }
 
+        //get paired devices and put them into listview
         pairedDevices = bluetoothAdapter.getBondedDevices();
         savedList = new ArrayList<>();
 
@@ -98,41 +99,51 @@ public class Bluetooth extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, savedList);
         listView.setAdapter(adapter);
 
-
         //setting on click listener to get chosen device
         listView.setOnItemClickListener((adapterView, view, i, l) -> selectedDeviceIndex = i);
 
-        updateText(false);
+        updateText();
 
-        Button btConnect = (Button) findViewById(R.id.bluetooth_connect);
-        Button btDisconnect = (Button) findViewById(R.id.bluetooth_disconnect);
-
-        btConnect.setOnClickListener(this::bluetoothConnect);
-        btDisconnect.setOnClickListener(this::bluetoothDisconnect);
+        //click listeners on connect and disconnect buttons
+        findViewById(R.id.bluetooth_connect).setOnClickListener(this::bluetoothConnect);
+        findViewById(R.id.bluetooth_disconnect).setOnClickListener(this::bluetoothDisconnect);
 
     }
 
 
     public void bluetoothConnect(View view) {
 
+        //no device chosen
+        if (selectedDeviceIndex == null) return;
+
         //create temp list to get device by index
         List<BluetoothDevice> tmpList = new ArrayList<>(pairedDevices);
         BluetoothDevice device = tmpList.get(selectedDeviceIndex);
-        String deviceName = tmpList.get(selectedDeviceIndex).toString();
+
+        //get socket
+        BluetoothSocket socket = ((MyApplication) this.getApplication()).getConnectedSocket();
 
         try {
-
-            //if socket is already connected, disconnect, do it in 2 steps because otherwise it throws exception
-            if (_socket != null) {
-                if (_socket.isConnected()) {
+            //if socket is already connected, disconnect
+            if (socket != null) {
+                if (socket.isConnected()) {
                     Log.d("Tag", "Closing already connected socket...");
-                    _socket.close();
 
+                    socket.close();
+                    ((MyApplication) this.getApplication()).setConnectedSocket(null);
                 }
             }
 
+            //need for device.getName();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                showDialogBox(3);
+                return;
+            }
+
+            Log.d("Tag", "device name: " + device.getName());
+
             //starting new thread to not stop main
-            BluetoothConnectThread thread = new BluetoothConnectThread(_socket, device, deviceName);
+            BluetoothConnectThread thread = new BluetoothConnectThread(socket, device, device.getName());
             thread.start();
 
         } catch (Exception e) {
@@ -144,9 +155,11 @@ public class Bluetooth extends AppCompatActivity {
 
     public void bluetoothDisconnect(View view) {
 
+        String name = ((MyApplication) this.getApplication()).getConnectedName();
+        BluetoothSocket socket = ((MyApplication) this.getApplication()).getConnectedSocket();
 
         //if no device connected
-        if (_socket == null || !_socket.isConnected()) {
+        if (name == null || socket == null || !socket.isConnected()) {
             showDialogBox(4);
             return;
         }
@@ -161,41 +174,42 @@ public class Bluetooth extends AppCompatActivity {
             return;
         }
 
-        String deviceName = savedList.get(selectedDeviceIndex);
-
         try {
 
             //closing and setting global to null
-            _socket.close();
-            ((MyApplication) this.getApplication()).setConnectedSocket(null);
+            socket.close();
 
-            Log.d("Tag", "Successfully disconnected from device \"" + deviceName + "\"");
-            updateText(false);
+            ((MyApplication) this.getApplication()).setConnectedSocket(null);
+            ((MyApplication) this.getApplication()).setConnectedName(null);
+
+            Log.d("Tag", "Successfully disconnected from device \"" + name + "\"");
 
 
         } catch (Exception e) {
-            Log.d("Tag", "Error disconnecting from device \"" + deviceName + "\"");
+            Log.d("Tag", "Error disconnecting from device \"" + name + "\"");
+            Log.d("Tag", "Print error: " + e);
 
             //show dialog with info
             showDialogBox(2);
-
         }
+
+        updateText();
     }
 
-    private void updateText(boolean flag) {
+    private void updateText() {
 
+        //get and update connected device name
+        String name = ((MyApplication) this.getApplication()).getConnectedName();
         String text = "Connected: ";
 
-        //flag means there is a connected device
-        if (flag) {
-            String deviceName = savedList.get(selectedDeviceIndex);
-            text = text.concat(deviceName);
-        } else {
+        //name == null check must be first, otherwise (when null) throws error on name.isEmpty()
+        if (name == null) {
             text = text.concat("none");
+        } else {
+            text = text.concat(name);
         }
 
         textView.setText(text);
-
     }
 
     //check if the permissions where granted, act accordingly
@@ -229,7 +243,7 @@ public class Bluetooth extends AppCompatActivity {
                 break;
             case 2:
                 title = "Connection error";
-                message = "Could not disconnect from this device";
+                message = "Device not connected";
                 break;
             case 3:
                 title = "Permissions";
@@ -300,22 +314,25 @@ public class Bluetooth extends AppCompatActivity {
 
                 //set global socket
                 ((MyApplication) Bluetooth.this.getApplication()).setConnectedSocket(socket);
-                _socket = socket;
+                ((MyApplication) Bluetooth.this.getApplication()).setConnectedName(name);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("Tag", "Error connecting to device");
+                Log.d("Tag", "Error: " + e);
+
+                //set global socket to null
+                ((MyApplication) Bluetooth.this.getApplication()).setConnectedSocket(null);
+                ((MyApplication) Bluetooth.this.getApplication()).setConnectedName(null);
             }
 
             runOnUiThread(() -> {
                 //update text depending of the outcome
-                if (socket != null && socket.isConnected()) {
-                    updateText(true);
-                } else {
-                    updateText(false);
-
+                if (socket == null || !socket.isConnected()) {
                     //show dialog with info
                     showDialogBox(1);
                 }
+
+                updateText();
 
                 //set window back to interactive
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -324,5 +341,13 @@ public class Bluetooth extends AppCompatActivity {
                 findViewById(R.id.loading_gif).setVisibility(View.GONE);
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //update text when we open this activity
+//        updateText();
     }
 }

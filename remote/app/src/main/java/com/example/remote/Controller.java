@@ -1,23 +1,21 @@
 package com.example.remote;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.DataOutputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class Controller extends AppCompatActivity implements View.OnTouchListener {
 
@@ -36,24 +34,21 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
         bottomNavigationView.setSelectedItemId(R.id.controller);
 
         //perform item selected listener
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
 
-                if(id == R.id.bluetooth){
-                    startActivity(new Intent(getApplicationContext(), Bluetooth.class));
-                }else if (id == R.id.controller){
-                    return false;
-                }else if (id == R.id.microphone){
-                    startActivity(new Intent(getApplicationContext(), Microphone.class));
-                }else if (id == R.id.tilt){
-                    startActivity(new Intent(getApplicationContext(), Tilt.class));
-                }
-
-                overridePendingTransition(0, 0);
-                return false;
+            if (id == R.id.bluetooth) {
+                startActivity(new Intent(getApplicationContext(), Bluetooth.class));
+            } else if (id == R.id.controller) {
+                return false; //same page
+            } else if (id == R.id.microphone) {
+                startActivity(new Intent(getApplicationContext(), Microphone.class));
+            } else if (id == R.id.tilt) {
+                startActivity(new Intent(getApplicationContext(), Tilt.class));
             }
+
+            overridePendingTransition(0, 0);
+            return false;
         });
 
         Button buttonUp = findViewById(R.id.controller_button_up);
@@ -61,10 +56,9 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
         Button buttonLeft = findViewById(R.id.controller_button_left);
         Button buttonRight = findViewById(R.id.controller_button_right);
 
-        buttonUp.setOnTouchListener((View.OnTouchListener) this);
-        buttonDown.setOnTouchListener((View.OnTouchListener) this);
-        buttonLeft.setOnTouchListener((View.OnTouchListener) this);
-        buttonRight.setOnTouchListener((View.OnTouchListener) this);
+        for (Button button : Arrays.asList(buttonUp, buttonDown, buttonLeft, buttonRight)) {
+            button.setOnTouchListener((View.OnTouchListener) this);
+        }
 
 
         try {
@@ -76,7 +70,6 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
         } catch (Exception e) {
             Log.d("tag", e.toString());
             showDialogBox(1);
-            return;
         }
 
 
@@ -108,11 +101,7 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
         builder
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
+                .setPositiveButton("Ok", (dialogInterface, i) -> {
                 });
 
         AlertDialog dialog = builder.create();
@@ -123,49 +112,36 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
         //check if connected
-        if(_outStream == null) return false;
+        if (_outStream == null) return false;
 
-        Character command = '0'; // null command
+        char command = '0'; // null command
+        int id = view.getId();
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+
             //when button pressed down choose specific command
-            switch (view.getId()) {
-                case R.id.controller_button_up:
-                    command = 'F';
-                    break;
-                case R.id.controller_button_down:
-                    command = 'B';
-                    break;
-                case R.id.controller_button_left:
-                    command = 'L';
-                    break;
-                case R.id.controller_button_right:
-                    command = 'R';
-                    break;
-                default:
-                    break;
+            if (id == R.id.controller_button_up) {
+                command = 'F';
+            } else if (id == R.id.controller_button_down) {
+                command = 'B';
+            } else if (id == R.id.controller_button_left) {
+                command = 'L';
+            } else if (id == R.id.controller_button_right) {
+                command = 'R';
             }
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
             //when button lifted up, set horizontal or vertical movement to default
-            switch (view.getId()) {
-                case R.id.controller_button_up:
-                case R.id.controller_button_down:
-                    command = 'X';  //stop back
-                    break;
-                case R.id.controller_button_left:
-                case R.id.controller_button_right:
-                    command = 'S'; // set front straight
-                    break;
-                default:
-                    break;
+            if (id == R.id.controller_button_up || id == R.id.controller_button_down) {
+                command = 'X';  //stop back
+            } else if (id == R.id.controller_button_left || id == R.id.controller_button_right) {
+                command = 'S'; // set front straight
             }
         }
 
-//        Log.d("tag", command.toString());
         try {
             _outStream.writeChar(command);
-        }catch (Exception e){
+        } catch (Exception e) {
             //log
             Log.d("tag", e.toString());
 
