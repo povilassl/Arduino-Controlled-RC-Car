@@ -19,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Locale;
 
 public class Tilt extends AppCompatActivity {
 
@@ -71,18 +72,19 @@ public class Tilt extends AppCompatActivity {
         TextView tilt_text_z = findViewById(R.id.tilt_text_z);
         TextView tilt_command = findViewById(R.id.tilt_command);
 
-        SensorManager sm = (SensorManager) getSystemService(getApplicationContext().SENSOR_SERVICE);
+        SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
         List<Sensor> list = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
 
-
         SensorEventListener se = new SensorEventListener() {
-
             Character commandFront = ' ';
             Character commandBack = ' ';
             Character prevCommandFront = ' ';
             Character prevCommandBack = ' ';
 
             String commands_text;
+            String text_x;
+            String text_y;
+            String text_z;
 
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
@@ -105,9 +107,13 @@ public class Tilt extends AppCompatActivity {
                 y = (float) (y / norm_of_g);
                 z = (float) (z / norm_of_g);
 
-                tilt_text_x.setText("X: " + String.format("%.3f", x));
-                tilt_text_y.setText("Y: " + String.format("%.3f", y));
-                tilt_text_z.setText("Z: " + String.format("%.3f", z));
+                text_x = "X: " + String.format(Locale.ENGLISH, "%.3f", x);
+                text_y = "Y: " + String.format(Locale.ENGLISH, "%.3f", y);
+                text_z = "Z: " + String.format(Locale.ENGLISH, "%.3f", z);
+
+                tilt_text_x.setText(text_x);
+                tilt_text_y.setText(text_y);
+                tilt_text_z.setText(text_z);
 
                 //front command
                 if (x < -0.2) {
@@ -128,7 +134,7 @@ public class Tilt extends AppCompatActivity {
                 } else if (y > 0.2) {
                     commandBack = 'B';
                     commands_text = commands_text.concat("Backward");
-                } else if (y <= 0.2 && y >= -0.2){
+                } else if (y <= 0.2 && y >= -0.2) {
                     commandBack = 'X';
                     commands_text = commands_text.concat("Stop");
                 }
@@ -211,6 +217,8 @@ public class Tilt extends AppCompatActivity {
             _outStream.writeChar('S');
             _outStream.writeChar('X');
         } catch (Exception e) {
+            //suppress warning
+            assert true;
         }
     }
 }

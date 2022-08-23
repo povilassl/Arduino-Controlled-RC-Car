@@ -165,6 +165,8 @@ public class Controller extends AppCompatActivity implements View.OnTouchListene
             _outStream.writeChar('S');
             _outStream.writeChar('X');
         } catch (Exception e) {
+            //suppress warning
+            assert true;
         }
     }
 }

@@ -118,10 +118,10 @@ public class Microphone extends AppCompatActivity {
             public void onResults(Bundle bundle) {
                 //getting matches
                 ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
                 //display first match
-                if (matches != null) {
-                    textView.setText("Input: " + matches.get(0));
+                if (matches.get(0) != null) {
+                    String text = "Input: ".concat(matches.get(0));
+                    textView.setText(text);
                     sendCommand(matches.get(0));
                 }
             }
@@ -312,6 +312,8 @@ public class Microphone extends AppCompatActivity {
             _outStream.writeChar('S');
             _outStream.writeChar('X');
         } catch (Exception e) {
+            //suppress warning
+            assert true;
         }
     }
 }
