@@ -1,8 +1,10 @@
 # Bluetooth controlled rc car
 
+Project uses:
+- Rc truck name - "Midnight pumpkin"
+- Servo motor
+- Motor controller - TEU101-BK
+- Arduino UNO
+- Bluetooth module JY-MCU
 
-TODO:
-- [ ] Fix bug of not diconnecting
-- [x] loading gif while connecting
-- [x] tilt sensor control
-- [ ] stop everything upon exiting an activiy
+
